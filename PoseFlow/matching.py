@@ -31,15 +31,9 @@ def orb_matching(img1_path, img2_path, vidname, img1_id, img2_id):
     out_path = "%s/%s_%s_orb.txt"%(vidname, img1_id, img2_id)
     # print(out_path)
     
-    if isinstance(img1_path, str):
-        img1 = cv2.cvtColor(cv2.imread(img1_path), cv2.COLOR_BGR2RGB)
-    else:
-        img1 = cv2.cvtColor(img1_path, cv2.COLOR_BGR2RGB)
-    if isinstance(img2_path, str):
-        img2 = cv2.cvtColor(cv2.imread(img2_path), cv2.COLOR_BGR2RGB)
-    else:
-        img2 = cv2.cvtColor(img2_path, cv2.COLOR_BGR2RGB)
-    
+    img1 = cv2.cvtColor(cv2.imread(img1_path), cv2.COLOR_BGR2RGB)
+    img2 = cv2.cvtColor(cv2.imread(img2_path), cv2.COLOR_BGR2RGB)
+
     # Initiate ORB detector
     orb = cv2.ORB_create(nfeatures=10000, scoreType=cv2.ORB_FAST_SCORE)
 

@@ -113,9 +113,24 @@ if __name__ == "__main__":
     mode, input_root = check_input()
     output_root = args.outputpath
 
+    detector = get_detector(args)
+
+    # Load pose model
+    pose_model = builder.build_sppe(cfg.MODEL, preset_cfg=cfg.DATA_PRESET)
+
+    print(f'Loading pose model from {args.checkpoint}...')
+    pose_model.load_state_dict(torch.load(args.checkpoint, map_location=args.device))
+
+    if len(args.gpus) > 1:
+        pose_model = torch.nn.DataParallel(pose_model, device_ids=args.gpus).to(args.device)
+    else:
+        pose_model.to(args.device)
+    pose_model.eval()
+
     for pkg_id in os.listdir(input_root):
         pkg_root = os.path.join(input_root, pkg_id)
         for vid_id in os.listdir(pkg_root):
+            print('[%s/%s]' % (pkg_id, vid_id.split('.')[0]))
             input_path = os.path.join(pkg_root, vid_id)
             input_source = sorted(os.listdir(input_path))
             output_source = os.path.join(output_root, pkg_id)
@@ -126,25 +141,11 @@ if __name__ == "__main__":
             if not os.path.exists(output_source):
                 os.makedirs(output_source)
 
-
-
             # Load detection loader
             if mode == 'webcam':
-                det_loader = WebCamDetectionLoader(input_source, get_detector(args), cfg, args).start()
+                det_loader = WebCamDetectionLoader(input_source, detector, cfg, args).start()
             else:
-                det_loader = DetectionLoader(input_source, get_detector(args), cfg, args, batchSize=args.detbatch, mode=mode).start()
-
-            # Load pose model
-            pose_model = builder.build_sppe(cfg.MODEL, preset_cfg=cfg.DATA_PRESET)
-
-            print(f'Loading pose model from {args.checkpoint}...')
-            pose_model.load_state_dict(torch.load(args.checkpoint, map_location=args.device))
-
-            if len(args.gpus) > 1:
-                pose_model = torch.nn.DataParallel(pose_model, device_ids=args.gpus).to(args.device)
-            else:
-                pose_model.to(args.device)
-            pose_model.eval()
+                det_loader = DetectionLoader(input_source, detector, cfg, args, batchSize=args.detbatch, mode=mode).start()
 
             runtime_profile = {
                 'dt': [],
@@ -230,5 +231,5 @@ if __name__ == "__main__":
                     writer.clear_queues()
                     # det_loader.clear_queues()
             final_result = writer.results()
-            write_json(final_result, output_source, form=args.format, for_eval=args.eval)
+            write_json(final_result, output_path, form=args.format, for_eval=args.eval)
             print("Results have been written to json.")

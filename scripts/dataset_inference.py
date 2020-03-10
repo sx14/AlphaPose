@@ -35,7 +35,7 @@ parser.add_argument('--indir', dest='inputpath',
 parser.add_argument('--detector', dest='detector',
                     help='detector name', default="yolo")
 parser.add_argument('--outdir', dest='outputpath',
-                    help='output-directory', default="data/vidor_hoid_mini/Pose")
+                    help='output-directory', default="data/vidor_hoid_mini/Pose/VID/val")
 parser.add_argument('--save_img', default=False, action='store_true',
                     help='save result as image')
 parser.add_argument('--vis', default=False, action='store_true',

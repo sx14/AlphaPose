@@ -21,18 +21,20 @@ from alphapose.utils.writer import DataWriter
 
 """----------------------------- Demo options -----------------------------"""
 parser = argparse.ArgumentParser(description='AlphaPose Demo')
-parser.add_argument('--cfg', dest='cfg', type=str, required=True,
+parser.add_argument('--cfg', dest='cfg', type=str,
                     default='configs/coco/resnet/256x192_res152_lr1e-3_1x-duc.yaml',
                     help='experiment configure file name')
-parser.add_argument('--checkpoint', dest='checkpoint', type=str, required=True,
+parser.add_argument('--checkpoint', dest='checkpoint', type=str,
                     default='pretrained_models/fast_421_res152_256x192.pth',
                     help='checkpoint file name')
 parser.add_argument('--sp', default=False, action='store_true',
                     help='Use single process for pytorch')
+parser.add_argument('--indir', dest='inputpath',
+                    help='image-directory', default="")
 parser.add_argument('--detector', dest='detector',
                     help='detector name', default="yolo")
 parser.add_argument('--outdir', dest='outputpath',
-                    help='output-directory', default="examples/res/")
+                    help='output-directory', default="data/vidor_hoid_mini/Pose")
 parser.add_argument('--save_img', default=False, action='store_true',
                     help='save result as image')
 parser.add_argument('--vis', default=False, action='store_true',
@@ -59,7 +61,7 @@ parser.add_argument('--debug', default=False, action='store_true',
                     help='print detail information')
 """----------------------------- Video options -----------------------------"""
 parser.add_argument('--video', dest='video',
-                    help='video-name', default="")
+                    help='video-name', default="data/vidor_hoid_mini/Data/VID/val")
 parser.add_argument('--save_video', dest='save_video',
                     help='whether to save rendered video', default=False, action='store_true')
 parser.add_argument('--vis_fast', dest='vis_fast',
@@ -88,11 +90,8 @@ def check_input():
 
     # for video frame
     if len(args.video):
-        if os.path.isfile(args.video):
-            video_root = args.video
-            return 'image', video_root
-        else:
-            raise IOError('Error: --video must refer to a video file, not directory.')
+        video_root = args.video
+        return 'image', video_root
     else:
         raise NotImplementedError
 
@@ -118,11 +117,17 @@ if __name__ == "__main__":
     for pkg_id in os.listdir(input_root):
         pkg_root = os.path.join(input_root, pkg_id)
         for vid_id in os.listdir(pkg_root):
-            input_source = os.path.join(pkg_root, vid_id)
-            output_source = os.path.join(output_root, pkg_id, vid_id)
+            input_path = os.path.join(pkg_root, vid_id)
+            input_source = sorted(os.listdir(input_path))
+            output_source = os.path.join(output_root, pkg_id)
+            output_path = os.path.join(output_source, vid_id.split('.')[0]+'.json')
+
+            args.inputpath = input_path
 
             if not os.path.exists(output_source):
                 os.makedirs(output_source)
+
+
 
             # Load detection loader
             if mode == 'webcam':

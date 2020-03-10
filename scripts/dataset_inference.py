@@ -30,7 +30,8 @@ parser.add_argument('--checkpoint', dest='checkpoint', type=str,
 parser.add_argument('--sp', default=False, action='store_true',
                     help='Use single process for pytorch')
 parser.add_argument('--indir', dest='inputpath',
-                    help='image-directory', default="")
+                    help='image-directory',
+                    default="data/vidor_hoid_mini/Data/VID/val")
 parser.add_argument('--detector', dest='detector',
                     help='detector name', default="yolo")
 parser.add_argument('--outdir', dest='outputpath',
@@ -61,7 +62,7 @@ parser.add_argument('--debug', default=False, action='store_true',
                     help='print detail information')
 """----------------------------- Video options -----------------------------"""
 parser.add_argument('--video', dest='video',
-                    help='video-name', default="data/vidor_hoid_mini/Data/VID/val")
+                    help='video-name', default="")
 parser.add_argument('--save_video', dest='save_video',
                     help='whether to save rendered video', default=False, action='store_true')
 parser.add_argument('--vis_fast', dest='vis_fast',
@@ -87,13 +88,11 @@ if not args.sp:
 
 
 def check_input():
+    # for images
+    if len(args.inputpath):
+        input_root = args.inputpath
 
-    # for video frame
-    if len(args.video):
-        video_root = args.video
-        return 'image', video_root
-    else:
-        raise NotImplementedError
+        return 'image', input_root
 
 
 def print_finish_info():

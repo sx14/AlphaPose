@@ -98,13 +98,20 @@ for pkg_id in os.listdir(pose_root):
                 ymax = traj_boxes[box_idx]['bbox']['ymax']
                 tbox = [xmin, ymin, xmax, ymax]
 
+                max_iou = 0
+                max_ind = 0
                 for kps_ind, kps in enumerate(frm_kps):
                     pbox = frm_pboxes[kps_ind]
-                    if iou(tbox, pbox) > 0.5:
-                        human_box_pose_cnt += 1
-                        traj_boxes[box_idx]['kps'] = frm_kps[kps_ind]
-                    else:
-                        traj_boxes[box_idx]['kps'] = None
+                    curr_iou = iou(pbox, tbox)
+                    if curr_iou > max_iou:
+                        max_iou = curr_iou
+                        max_ind = kps_ind
+
+                if max_iou > 0.4:
+                    human_box_pose_cnt += 1
+                    traj_boxes[box_idx]['kps'] = frm_kps[max_ind]
+                else:
+                    traj_boxes[box_idx]['kps'] = None
         print('[%s/%s]: %.2f' % (pkg_id, vid_id.split('.')[0],
                                  human_box_pose_cnt * 1.0 / human_box_cnt))
 

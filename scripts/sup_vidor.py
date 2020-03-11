@@ -100,8 +100,7 @@ for pkg_id in os.listdir(pose_root):
 
                 max_iou = 0
                 max_ind = 0
-                for kps_ind, kps in enumerate(frm_kps):
-                    pbox = frm_pboxes[kps_ind]
+                for kps_ind, pbox in enumerate(frm_pboxes):
                     curr_iou = iou(pbox, tbox)
                     if curr_iou > max_iou:
                         max_iou = curr_iou

@@ -78,7 +78,9 @@ for pkg_id in os.listdir(pose_root):
             res_traj = json.load(f)
             tid2cate = load_tid2cls(res_traj)
 
-        trajs = res_traj['trajectory']
+        human_box_cnt = 0
+        human_box_pose_cnt = 0
+        trajs = res_traj['trajectories']
         for fid in range(len(trajs)):
             traj_boxes = trajs[fid]
             frm_kps = fid2pose[fid]
@@ -89,6 +91,7 @@ for pkg_id in os.listdir(pose_root):
                 if tid2cate[tid] not in human_cates:
                     continue
 
+                human_box_cnt += 1
                 xmin = traj_boxes[box_idx]['bbox']['xmin']
                 xmax = traj_boxes[box_idx]['bbox']['xmax']
                 ymin = traj_boxes[box_idx]['bbox']['ymin']
@@ -98,9 +101,12 @@ for pkg_id in os.listdir(pose_root):
                 for kps_ind, kps in enumerate(frm_kps):
                     pbox = frm_pboxes[kps_ind]
                     if iou(tbox, pbox) > 0.5:
+                        human_box_pose_cnt += 1
                         traj_boxes[box_idx]['kps'] = frm_kps[kps_ind]
                     else:
                         traj_boxes[box_idx]['kps'] = None
+        print('[%s/%s]: %.2f' % (pkg_id, vid_id.split('.')[0],
+                                 human_box_pose_cnt * 1.0 / human_box_cnt))
 
         vid_anno_with_pose_file_root = os.path.join(anno_pose_root, pkg_id)
         if not os.path.exists(vid_anno_with_pose_file_root):

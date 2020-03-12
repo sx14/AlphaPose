@@ -78,11 +78,11 @@ def draw_box(box, im):
 
 
 if __name__ == '__main__':
-    anno_root = ''
-    data_root = ''
+    anno_root = '../data/vidor_hoid_mini/anno_with_pose/validation'
+    data_root = '../data/vidor_hoid_mini/Data/VID/val'
 
-    pkg_id = ''
-    vid_id = ''
+    pkg_id = '0000'
+    vid_id = '2401075277'
 
     anno_path = os.path.join(anno_root, pkg_id, vid_id+'.json')
     data_path = os.path.join(data_root, pkg_id, vid_id)
@@ -96,12 +96,13 @@ if __name__ == '__main__':
         im = cv2.imread(frm_path)
         frm_dets = trajs[frm_idx]
         for det in frm_dets:
+            box = [det['bbox']['xmin'], det['bbox']['ymin'],
+                   det['bbox']['xmax'], det['bbox']['ymax']]
             if 'kps' in det and det['kps'] is not None:
-                box = det['bbox']
                 kps = np.array(det['kps']).reshape((17, 3))
                 draw_human_object_skeleton(box, kps, im)
             else:
-                draw_box(det['bbox'], im)
+                draw_box(box, im)
 
         cv2.imshow('123', im)
         cv2.waitKey(0)

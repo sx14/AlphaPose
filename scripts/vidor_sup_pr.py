@@ -145,10 +145,10 @@ for pid_vid in sorted(all_trajs):
             else:
                 frm_dets[det_idx]['kps'] = None
 
-        if human_box_cnt > 0:
-            print('[%s/%s]: %.2f' % (pkg_id, vid_id, human_box_pose_cnt * 1.0 / human_box_cnt))
-        else:
-            print('[%s/%s]: %.2f' % (pkg_id, vid_id, -1))
+    if human_box_cnt > 0:
+        print('[%s/%s]: %.2f' % (pkg_id, vid_id, human_box_pose_cnt * 1.0 / human_box_cnt))
+    else:
+        print('[%s/%s]: %.2f' % (pkg_id, vid_id, -1))
 
     add_pose(fid2dets, vid_trajs, human_cates)
 

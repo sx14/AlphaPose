@@ -104,7 +104,7 @@ human_cates = {'adult', 'child', 'baby'}
 for pid_vid in sorted(all_trajs):
 
     pkg_id, vid_id = pid_vid.split('/')
-    vid_pose_file_path = os.path.join(pose_root, pkg_id, vid_id)
+    vid_pose_file_path = os.path.join(pose_root, pkg_id, vid_id+'.json')
     with open(vid_pose_file_path) as f:
         fid2pose = load_pose(json.load(f))
 
@@ -145,11 +145,13 @@ for pid_vid in sorted(all_trajs):
             else:
                 frm_dets[det_idx]['kps'] = None
 
-        print('[%s/%s]: %.2f' % (pkg_id, vid_id.split('.')[0],
-                                 human_box_pose_cnt * 1.0 / human_box_cnt))
+        if human_box_cnt > 0:
+            print('[%s/%s]: %.2f' % (pkg_id, vid_id, human_box_pose_cnt * 1.0 / human_box_cnt))
+        else:
+            print('[%s/%s]: %.2f' % (pkg_id, vid_id, -1))
 
     add_pose(fid2dets, vid_trajs, human_cates)
 
-with open(traj_with_pose_path) as f:
+with open(traj_with_pose_path, 'w') as f:
     json.dump(traj_file, f)
 print('%s saved' % traj_with_pose_path)
